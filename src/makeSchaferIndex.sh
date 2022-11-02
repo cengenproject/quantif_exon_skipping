@@ -2,8 +2,8 @@
 #SBATCH --partition=general
 #SBATCH --job-name=schafer_ind
 #SBATCH -c 1
-#SBATCH --mem=40G
-#SBATCH --time=1-00:10:00
+#SBATCH --mem=1G
+#SBATCH --time=00:10:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=alexis.weinreb@yale.edu
 
@@ -14,11 +14,9 @@ echo "Make index for Schafer quantification method. Starting $(date)"
 WS="WS281"
 
 ref_dir="/gpfs/ycga/project/ysm/hammarlund/aw853/references/$WS"
-
-schafer_index=$ref_dir"/schafer_index"
 ref_gff=$ref_dir"/c_elegans.PRJNA13758.${WS}.canonical_geneset.gtf"
 
-module load HTSeq/0.6.1p1-foss-2016b-Python-2.7.13
+module load HTSeq/0.13.5-foss-2020b-Python-3.8.6
 python ~/.utilities/DEXSeq/dexseq_prepare_annotation.py $ref_gff tmp_flattened.gff
 
 # select "exonic_part" entries, rename them gene_id:exonic_part_number (e.g. WBGene00000001:001)
