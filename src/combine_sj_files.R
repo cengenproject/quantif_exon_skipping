@@ -56,7 +56,7 @@ read_sj_file <- function(cur_path){
 # fn must be a function operating on the rows of a matrix (e.g. rowSums, rowMaxs, etc...)
 combine_sj <- function(sj_file, fn){
   reduce(sj_file, full_join, by = c("chr", "start", "end", "strand", "motif", "annotated")) |>
-    mutate(across(starts_with("count"), replace_na, 0)) |>
+    mutate(across(starts_with("count"), replace_na, 0)) %>%
     mutate(count_unique = fn(as.matrix(select(., starts_with("count_unique"))))) |>
     select(-starts_with("count_unique.")) |>
     arrange(chr, start, end)

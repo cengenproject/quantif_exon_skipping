@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --partition=general
 #SBATCH --job-name=merge_index_bam
-#SBATCH -c 10
+#SBATCH -c 1
 #SBATCH --mem=25G
 #SBATCH --time=5-00:10:00
 #SBATCH --mail-type=ALL
@@ -60,7 +60,7 @@ echo "-----   Merging SJ   -----"
 module swap SAMtools R
 
 Rscript src/combine_sj_files.R \
-  --sj_dir /SAY/standard/mh588-CC1100-MEDGEN/bulk_alignments/bsn9_junctions/
+  --sj_dir /SAY/standard/mh588-CC1100-MEDGEN/bulk_alignments/bsn9_junctions/ \
   --out_dir $out_dir/junctions
 
 echo
