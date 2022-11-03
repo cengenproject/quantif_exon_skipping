@@ -55,10 +55,10 @@ read_sj_file <- function(cur_path){
 
 # fn must be a function operating on the rows of a matrix (e.g. rowSums, rowMaxs, etc...)
 combine_sj <- function(sj_file, fn){
-  reduce(sj_file, full_join, by = c("chr", "start", "end", "strand", "motif", "annotated")) %>%
-    mutate(across(starts_with("count"), replace_na, 0)) %>%
-    mutate(count_unique = fn(as.matrix(select(., starts_with("count_unique"))))) %>%
-    select(-starts_with("count_unique.")) %>%
+  reduce(sj_file, full_join, by = c("chr", "start", "end", "strand", "motif", "annotated")) |>
+    mutate(across(starts_with("count"), replace_na, 0)) |>
+    mutate(count_unique = fn(as.matrix(select(., starts_with("count_unique"))))) |>
+    select(-starts_with("count_unique.")) |>
     arrange(chr, start, end)
 }
 
@@ -69,14 +69,14 @@ cat("Processing.\n")
 
 tibble(path = list.files(opt$sj_dir, full.names = TRUE),
        replicate = stringr::str_split_fixed(basename(path), "\\.", 2)[,1],
-       sample = stringr::str_split_fixed(replicate, "t", 2)[,1]) %>%
-  mutate(sj_file = map(path, read_sj_file)) %>%
-  group_by(sample) %>%
+       sample = stringr::str_split_fixed(replicate, "t", 2)[,1]) |>
+  mutate(sj_file = map(path, read_sj_file)) |>
+  group_by(sample) |>
   summarize(sj_file_combined = list(combine_sj(sj_file, rowSums))) |>
   mutate(out_path = file.path(opt$out_dir, sample) |>
            paste0(".SJ.tab")) |>
-  select(sj_file = sj_file_combined,
-         out_path) |>
+  select(x = sj_file_combined,
+         file = out_path) |>
   pwalk(write_tsv)
 
 
