@@ -42,7 +42,7 @@ my_SJ_tab=$data_dir/junctions/$sample.SJ.tab
 s=$tmp_dir/${sample}
 
 
-coverageBed -split -abam $my_bam -b $gff \
+coverageBed -split -a $gff -b $my_bam \
 	| awk 'BEGIN{OFS="\t"}{print $1,$4,$5,$5-$4+1,$9,$10}' \
 	| sort -k 5 \
 	> $s.exonic_parts.inclusion
