@@ -2,11 +2,12 @@
 #SBATCH --partition=general
 #SBATCH --job-name=schafer_quantif
 #SBATCH -c 1
-#SBATCH --mem=40G
+#SBATCH --mem=80G
 #SBATCH --time=1-00:10:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=alexis.weinreb@yale.edu
 
+set -ue
 
 echo "Schafer quantification. Starting $(date)"
 
@@ -17,17 +18,19 @@ readLength=101
 
 
 ref_dir="/gpfs/ycga/project/ysm/hammarlund/aw853/references/$WS"                                                                                                                                                                                                                                                                                                                                                                   
-gff=$ref_dir"/${WS}_schafer_index.gff"
+gff=$ref_dir/${WS}_schafer_index.gff
 
-data_dir="/home/aw853/scratch60/2022-11-03_bsn9/"
-out_dir="2022-11-03_schafer_psi/"
-tmp_dir="/home/aw853/scratch60/221103_schafer/"
+data_dir="/home/aw853/scratch60/2022-11-03_bsn9"
+out_dir="data/2022-11-03_schafer_psi"
+tmp_dir="/home/aw853/scratch60/221103_schafer"
+
+mkdir -p $tmp_dir
+mkdir -p $out_dir
 
 
 
 
-
-module load BEDTools/2.23.0-foss-2016a
+module load BEDTools
 
 # For each sample, ex ADLr173
 sample="ADLr173"
@@ -36,13 +39,13 @@ my_SJ_tab=$data_dir/junctions/$sample.SJ.tab
 
 
 
-$s=$tmp_dir/${sample}
+s=$tmp_dir/${sample}
 
 
 coverageBed -split -abam $my_bam -b $gff \
 	| awk 'BEGIN{OFS="\t"}{print $1,$4,$5,$5-$4+1,$9,$10}' \
 	| sort -k 5 \
-	> $tmp_dir/$sample.inclusion
+	> $s.exonic_parts.inclusion
 
 
 # Convert STAR SJ output to emulate TopHat
