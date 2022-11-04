@@ -49,7 +49,8 @@ coverageBed -split -a $gff -b $my_bam \
 
 
 # Convert STAR SJ output to emulate TopHat
-awk 'BEGIN{OFS="\t"}{                                           \
+awk 'BEGIN{OFS="\t"}                                            \
+      ($3-$2+1 < 25000){                                        \
       print $1, $2-20-1, $3+20, "JUNCBJ"NR, $7,                 \
             ($4 == 1)? "+":"-",$2-20-1, $3+20, "255,0,0", 2,    \
             "20,20", "0,300"                                    \
