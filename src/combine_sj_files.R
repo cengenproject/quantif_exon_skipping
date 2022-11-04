@@ -77,6 +77,6 @@ tibble(path = list.files(opt$sj_dir, full.names = TRUE),
            paste0(".SJ.tab")) |>
   select(x = sj_file_combined,
          file = out_path) |>
-  pwalk(write_tsv)
+  pwalk(write_tsv, col_names = FALSE)
 
 
