@@ -33,16 +33,31 @@ suppa.py generateEvents \
     -i $ref_gtf \
     -o $out_dir/${WS}
 
-# Reformat result for easy conversion to BED
+### Reformat result for easy conversion to BED
 # From event name, extract coords of the skipped exon and the skipping intron, to tsv
 
-# could use that for headers
-#echo -e "name\tgene\tchr\tstrand\tstartLong\tendLong\tstartExon\tendExon" > SE_coords.tab
+# Initial version used an intermediate file, not necessary in the end, but useful 
+# for diagnostics
+# echo -e "name\tgene\tchr\tstrand\tstartLong\tendLong\tstartExon\tendExon" > SE_coords.tab
+# cat $out_dir/${WS}_SE_strict.ioe \
+#     | sed -nr 's/.*\t(WBGene[0-9]{8});SE:([IVX]{1,3}):([0-9]+)-([0-9]+):([0-9]+)-([0-9]+):([+\-])\t.*/\1\t\2\t\7\t\3\t\6\t\4\t\5/p' \
+#     | awk -v'OFS=\t' '{print "SE_"NR, $0}' \
+#      >> $out_dir/${WS}_SE_coords.tab
 
+
+# BED file for inclusion (exonic) reads, contains coords of central exon (the one that can be skipped)
 cat $out_dir/${WS}_SE_strict.ioe \
     | sed -nr 's/.*\t(WBGene[0-9]{8});SE:([IVX]{1,3}):([0-9]+)-([0-9]+):([0-9]+)-([0-9]+):([+\-])\t.*/\1\t\2\t\7\t\3\t\6\t\4\t\5/p' \
     | awk -v'OFS=\t' '{print "SE_"NR, $0}' \
-     > $out_dir/${WS}_SE_coords.tab
+    | awk -v'OFS="\t"' '{print($3, $7, $8, $1, 0, $4)}' \
+    > $out_dir/${WS}_SE_central_exon.bed
+
+# junctions tab file to match the ones created by STAR, with the coords of the intron
+cat $out_dir/${WS}_SE_strict.ioe \
+    | sed -nr 's/.*\t(WBGene[0-9]{8});SE:([IVX]{1,3}):([0-9]+)-([0-9]+):([0-9]+)-([0-9]+):([+\-])\t.*/\1\t\2\t\7\t\3\t\6\t\4\t\5/p' \
+    | awk -v'OFS=\t' '{print "SE_"NR, $0}' \
+    | awk -v 'OFS=\t' '{print($3,$5+1, $6-1, $4=="+"? 1: 2)}' \
+    > $out_dir/${WS}_SE_spanning_intron.tab
 
 
 
