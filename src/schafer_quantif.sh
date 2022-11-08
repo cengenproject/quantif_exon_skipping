@@ -42,14 +42,15 @@ my_SJ_tab=$data_dir/junctions/$sample.SJ.tab
 s=$tmp_dir/${sample}
 
 
-coverageBed -split -abam $my_bam -b $gff \
+coverageBed -split -a $gff -b $my_bam \
 	| awk 'BEGIN{OFS="\t"}{print $1,$4,$5,$5-$4+1,$9,$10}' \
 	| sort -k 5 \
 	> $s.exonic_parts.inclusion
 
 
 # Convert STAR SJ output to emulate TopHat
-awk 'BEGIN{OFS="\t"}{                                           \
+awk 'BEGIN{OFS="\t"}                                            \
+      ($3-$2+1 < 25000){                                        \
       print $1, $2-20-1, $3+20, "JUNCBJ"NR, $7,                 \
             ($4 == 1)? "+":"-",$2-20-1, $3+20, "255,0,0", 2,    \
             "20,20", "0,300"                                    \
