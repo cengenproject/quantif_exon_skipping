@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --partition=general
+#SBATCH --partition=bigmem
 #SBATCH --job-name=psi
 #SBATCH -c 1
-#SBATCH --mem=80G
-#SBATCH --time=1-00:10:00
+#SBATCH --mem=210G
+#SBATCH --time=10:10:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=alexis.weinreb@yale.edu
 
@@ -36,14 +36,13 @@ SE_annot="data/suppa2_data/221108_events/${WS}_"
 #SE_annot="/home/aw853/project/exon_skipping/data/suppa2_data/221108_events/${WS}_"
 
 data_dir="/home/aw853/scratch60/2022-11-03_bsn9"
-out_dir="data/2022-11-08_SE_PSI"
+out_dir="data/2022-11-10_SE_PSI"
 tmp_dir="/home/aw853/scratch60/221108_SE_PSI_all_samples"
 
-mkdir -p $tmp_dir
 mkdir -p $out_dir
 
-
-rm $tmp_dir/*
+rm -r $tmp_dir
+mkdir -p $tmp_dir
 
 
 mapfile -t bamList < <(ls $data_dir/bams/*.bam \
@@ -65,8 +64,10 @@ then
   exit 1
 else
   echo "Treating ${#sjList[@]} files."
+  echo "Estimate 2.5 min per sample."
 fi
 
+#bamList=(${sjList[@]:171})
 
 # Loop on samples ----
 
