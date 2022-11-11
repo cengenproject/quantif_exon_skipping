@@ -77,7 +77,7 @@ ul.task-list li input[type="checkbox"] {
 <p>One more note, for example in that TSplice paper, they used a similar approach, but averaged all the samples in a given tissue type. So they compute <span class="math inline">\(PSI_{e,t}\)</span>. I expect we are better off not following them, as the samples from a same neuron types are independent biological replicates, so keeping them separate allows us to capture meaningful biological variation.</p>
 <p>One thing that I still dislike is that in many cases, the exon skipping event is overlapping with other events. For example in this gene <em>tln-1</em>:</p>
 <p><img src="figures/tln-1_SE.png" class="img-fluid"></p>
-<p>Reads will be counted as inclusion reads even if the only transcript present is the one with the terminal exon. However, short of a full transcript quantification, there</p>
+<p>Reads will be counted as inclusion reads even if the only transcript present is the one with the terminal exon. However, short of a full transcript quantification, there are no easy way to deconvolve (and full transcript quantification is difficult here).</p>
 <section id="note-number-of-cases-in-the-dataset" class="level3">
 <h3 class="anchored" data-anchor-id="note-number-of-cases-in-the-dataset">Note: number of cases in the dataset</h3>
 <p>In that setting, we currently have <span class="math inline">\(S=193\)</span> samples, after quality control we might decrease it to <span class="math inline">\(190\)</span>. We also have <span class="math inline">\(E=1,109\)</span> events, which might decrease to <span class="math inline">\(1,000\)</span> after QC (as there are a few genes with many events on top of each other, this might not be an appropriate case).</p>
@@ -112,7 +112,8 @@ ul.task-list li input[type="checkbox"] {
 <p>So, for the design of the model itself, maybe something like this (I’m really very out of my expertise here, you shouldn’t trust anything I write now).</p>
 <p>For the sequences of the exon, upstream intron, and downstream intron, we use the same process as you did in the previous iteration, i.e.&nbsp;zero-padding, numerical encoding of the nucleotides, auto-encoder. This gives us the three vectors <span class="math inline">\(G^{exon}_e\)</span>, <span class="math inline">\(G^{iupstream}_e\)</span>, and <span class="math inline">\(G^{idownstream}_e\)</span>.</p>
 <p>For the gene sequences, we use the same process as you did before (with auto-encoder), and feed it into a Vision Transformer (that will take into account more long-range interactions), and keep the result <span class="math inline">\(G^{gupstream}_e\)</span> and <span class="math inline">\(G^{gdownstream}_e\)</span>.</p>
-<p>Finally all these can be concatenated and used in a MLP to predict the sample-specific PSI: <span class="math display">\[
+<p>Finally all these can be concatenated and used in a MLP to predict the sample-specific PSI:</p>
+<p><span class="math display">\[
 \Delta PSI_{e,s} = dense(F_s, G^{exon}_e, G^{iupstream}_e, G^{idownstream}_e, G^{gupstream}_e, G^{gdownstream}_e)
 \]</span></p>
 </section>
