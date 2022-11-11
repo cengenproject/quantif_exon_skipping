@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Model</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="model_files/libs/clipboard/clipboard.min.js"></script>
+<script src="model_files/libs/quarto-html/quarto.js"></script>
+<script src="model_files/libs/quarto-html/popper.min.js"></script>
+<script src="model_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="model_files/libs/quarto-html/anchor.min.js"></script>
+<link href="model_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="model_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="model_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="model_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="model_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Model</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="biology" class="level1">
+<h1>Biology</h1>
+<p>To summarize the biology, alternative splicing can take various forms, which cannot be described in a unified way, and may involve different mechanisms. Here we will focus on the exon skipping: there is a gene, which has introns and exons, most of them constitutive (do not vary). In that gene, there is one particular exon that is alternative.</p>
+<p><img src="figures/exon_skipping.png" class="img-fluid"></p>
+<p>So instead of the previous approach of looking at all kind of alternative splicing of all forms, this time I started by looking for this exact configuration of exons within the genome. I got 1,109 such events (mostly in different genes, but there are a few cases with multiple events in the same gene).</p>
+<p>Code that I finished writing but that is still running, is about quantifying the relative amount of transcript 1 and transcript 2 in each sample (193 of them, subject to QC). So for each event and each sample, I will give you a PSI value between 0 and 1 or NA.</p>
+<p>If the gene is not expressed in that neuron type, the PSI is NA. If the PSI is 1, that means, in this sample, the gene is always in the form of transcript 1 (i.e.&nbsp;exon always included). If PSI = 0, that gene is always in the form of transcript 2 (always skipped). And then you can have all kind of values between 0 and 1, indicating a mixture of transcript 1 and transcript 2.</p>
+<section id="sample-definition-and-output" class="level2">
+<h2 class="anchored" data-anchor-id="sample-definition-and-output">Sample definition and output</h2>
+<p>We consider <span class="math inline">\(T\)</span> neuron types, the neuron type <span class="math inline">\(t\)</span> of them has <span class="math inline">\(S_t\)</span> samples.</p>
+<p>We consider “exon skipping” events, there are <span class="math inline">\(E\)</span> such events.</p>
+<p>For each sample <span class="math inline">\(s \in [1,S_t] \space / \space t \in [1,T]\)</span>, we can compute the relative amount of skipped transcript <span class="math inline">\(PSI_{e,s}\)</span>, and this is what we want to predict (i.e.&nbsp;regression task).</p>
+<p>What’s more, an interesting trick used by the authors of <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02273-7">Tsplice</a>, to encourage the model to focus on difference between samples, is to compute the average <span class="math inline">\(\overline{PSI}_e\)</span> for all samples, then for each sample compute the <span class="math inline">\((\Delta PSI)_{e,s}\)</span>, focusing on how this sample differs from the others.</p>
+<p>One more note, for example in that TSplice paper, they used a similar approach, but averaged all the samples in a given tissue type. So they compute <span class="math inline">\(PSI_{e,t}\)</span>. I expect we are better off not following them, as the samples from a same neuron types are independent biological replicates, so keeping them separate allows us to capture meaningful biological variation.</p>
+<p>One thing that I still dislike is that in many cases, the exon skipping event is overlapping with other events. For example in this gene <em>tln-1</em>:</p>
+<p><img src="figures/tln-1_SE.png" class="img-fluid"></p>
+<p>Reads will be counted as inclusion reads even if the only transcript present is the one with the terminal exon. However, short of a full transcript quantification, there</p>
+<section id="note-number-of-cases-in-the-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="note-number-of-cases-in-the-dataset">Note: number of cases in the dataset</h3>
+<p>In that setting, we currently have <span class="math inline">\(S=193\)</span> samples, after quality control we might decrease it to <span class="math inline">\(190\)</span>. We also have <span class="math inline">\(E=1,109\)</span> events, which might decrease to <span class="math inline">\(1,000\)</span> after QC (as there are a few genes with many events on top of each other, this might not be an appropriate case).</p>
+<p>So that would leave us with <span class="math inline">\(190 * 1,000 = 190,000\)</span> cases, which we can split into training and testing (stratifying to ensure that the training set has at least one example from each neuron type).</p>
+</section>
+</section>
+<section id="features" class="level2">
+<h2 class="anchored" data-anchor-id="features">Features</h2>
+<p>As described above, the output that we want to predict is a <span class="math inline">\(\Delta PSI_{e,s}\)</span>,, this is based on two sets of features.</p>
+<section id="genomic-sequence" class="level3">
+<h3 class="anchored" data-anchor-id="genomic-sequence">Genomic sequence</h3>
+<p>As with the previous iteration of the model, we have the sequence of the gene, <span class="math inline">\(G_e\)</span>. Contrary to the previous model, we are focusing on one part of the sequence, the one with the event, so maybe it makes sense to use a set of 5 features:</p>
+<ul>
+<li>sequence of the exon</li>
+<li>sequence of the upstream intron</li>
+<li>sequence of the downstream intron</li>
+<li>sequence of the entire gene up to the upstream intron</li>
+<li>sequence of the entire gene starting from the downstream intron</li>
+</ul>
+<p>This way the first 3 features would allow the model to focus on local aspects, the last 2 would enable taking the long-range interactions into consideration. It might even be a good idea in the future to use a different encoding for these sets of features.</p>
+<p>The last 2 might be better as a single sequence of the whole gene, but I don’t see how to include information about the position of the event within the gene.</p>
+<p>As a literature note, TSplice uses an approach like this, but takes only the closest 300 nucleotides of the introns, and the first and last 100 nucleotides of the exon, that way they have a fixed size of input.</p>
+</section>
+<section id="splice-factors" class="level3">
+<h3 class="anchored" data-anchor-id="splice-factors">Splice factors</h3>
+<p>For each sample, we have a vector of expression of all other transcripts <span class="math inline">\(F_s\)</span>. Each <span class="math inline">\(F_s\)</span> is a vector of about <span class="math inline">\(40,000\)</span> values in <span class="math inline">\([0, \infty[\)</span>.</p>
+<p>In practice, most of these are irrelevant, we would like our model to focus on the subset of genes that are actually Splice Factors in the biological sense, i.e.&nbsp;their presence has a causal effect on the <span class="math inline">\(PSI_{e,s}\)</span>. While, ideally, I would love the model to find out by itself which of the other transcripts are Splice Factors, for now we can restrict ourselves to the list of 239 in the file <code>list_sf.tsv</code> I previously uploaded on Box.</p>
+</section>
+</section>
+<section id="model" class="level2">
+<h2 class="anchored" data-anchor-id="model">Model</h2>
+<p>So, for the design of the model itself, maybe something like this (I’m really very out of my expertise here, you shouldn’t trust anything I write now).</p>
+<p>For the sequences of the exon, upstream intron, and downstream intron, we use the same process as you did in the previous iteration, i.e.&nbsp;zero-padding, numerical encoding of the nucleotides, auto-encoder. This gives us the three vectors <span class="math inline">\(G^{exon}_e\)</span>, <span class="math inline">\(G^{iupstream}_e\)</span>, and <span class="math inline">\(G^{idownstream}_e\)</span>.</p>
+<p>For the gene sequences, we use the same process as you did before (with auto-encoder), and feed it into a Vision Transformer (that will take into account more long-range interactions), and keep the result <span class="math inline">\(G^{gupstream}_e\)</span> and <span class="math inline">\(G^{gdownstream}_e\)</span>.</p>
+<p>Finally all these can be concatenated and used in a MLP to predict the sample-specific PSI: <span class="math display">\[
+\Delta PSI_{e,s} = dense(F_s, G^{exon}_e, G^{iupstream}_e, G^{idownstream}_e, G^{gupstream}_e, G^{gdownstream}_e)
+\]</span></p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
