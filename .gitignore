@@ -1,0 +1,11 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+data/*
+logs/*
+presentations/*.tex
+presentations/*_files
+presentations/*.log
+presentations/*.pptx
+slurm-*
