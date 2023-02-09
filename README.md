@@ -1,7 +1,7 @@
 # Quantification of exon skipping
 
 
-First, `src/prepare_alignments_bsn9.sh`:
+First, if necessary, run `prep_alignments_bsn9.sh` to assemble the bams and sj files from bsn9, store them on scratch60. It uses `samtools` and `src/combine_sj_files.R`
 
 ```
 input_bams="/SAY/standard/mh588-CC1100-MEDGEN/bulk_alignments/bsn9_bams/"
@@ -14,9 +14,12 @@ use it to merge BAMs from technical replicates (using `samtools`), and merge SJs
 
 ## SUPPA2 annotation
 
-In script `src/suppa2_generate_events.sh`, we run SUPPA2 to get SE (skipped exon) events annotation. It creates tab and bed files.
+In script `src/suppa2_generate_events.sh`, we run SUPPA2 to get SE (skipped exon) events annotation. It creates a tab file. In addition, calls `generate_CI_events.R` to extract an internal constitutive (CI) exon from the same genes as the SE. Finally, it makes two bed files from the tab file, to be used for quantification.
 
-Then `src/get_psi_for_SE.sh` counts inclusion and exclusion reads with `bedtools` and `grep`, starting with SE annotation bed, then call `src/assemble_psi.R` to create result `assembled_psi.tsv`.
+
+Then `src/get_psi_for_SE.sh` counts inclusion and exclusion reads with `bedtools` and `grep`, starting with SE annotation bed, and calls `src/assemble_psi.R` to create the result `assembled_psi.tsv`.
+
+Finally, can use `R/format_SE_psi.R` (not on cluster) to load `assembled_psi.tsv`, Alec's sc-bulk integration thresholds for filtering, and export `events_coordinates.tsv` and `PSI_quantifications.tsv`.
 
 
 ## Older approaches

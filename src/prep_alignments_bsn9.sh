@@ -16,7 +16,7 @@ echo "Prepare alignments bsn9 starting $(date)"
 
 input_bams="/SAY/standard/mh588-CC1100-MEDGEN/bulk_alignments/bsn9_bams/"
 input_sj="/SAY/standard/mh588-CC1100-MEDGEN/bulk_alignments/bsn9_junctions/"
-out_dir="/home/aw853/scratch60/2022-11-03_bsn9/"
+out_dir="/home/aw853/scratch60/2023-02-09_bsn9/"
 
 
 ### Prepare metadata
