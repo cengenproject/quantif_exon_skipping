@@ -26,14 +26,12 @@ option_list <- list(
 # ~ validate inputs ----
 if(interactive()){
   opt <- list(tab_file = "data/suppa2_data/221108_events/WS281_SE_coords.tab",
-              out_dir = ".",
               ws = "281")
 } else{
   opt <- parse_args(OptionParser(option_list=option_list))
 }
 
 stopifnot(file.exists(opt$tab_file))
-stopifnot(dir.exists(opt$out_dir))
 
 options(wb_dir_cache = paste0("/gpfs/ycga/project/ysm/hammarlund/aw853/references/", opt$ws))
 

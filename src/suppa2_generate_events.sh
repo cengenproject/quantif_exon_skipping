@@ -7,6 +7,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=alexis.weinreb@yale.edu
 
+set -ue
 
 echo "Start $(date)"
 
@@ -27,7 +28,7 @@ mkdir -p $out_dir
 # SUPPA2 generate SE events
 
 suppa.py generateEvents \
-    --mode DEBUG \
+    --mode INFO \
     --event-type SE \
     -f ioe \
     -i $ref_gtf \
@@ -45,6 +46,7 @@ cat $out_dir/${WS}_SE_strict.ioe \
 
 
 # Find control exons in the same gene but constitutive, internal. Append to coords.tab file
+module swap miniconda R
 Rscript src/generate_CI_events.R \
         --tab_file $out_dir/${WS}_SE_coords.tab \
         --ws $WS
