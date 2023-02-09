@@ -26,7 +26,7 @@ option_list <- list(
 # ~ validate inputs ----
 if(interactive()){
   opt <- list(tab_file = "data/suppa2_data/221108_events/WS281_SE_coords.tab",
-              ws = "281")
+              ws = "WS281")
 } else{
   opt <- parse_args(OptionParser(option_list=option_list))
 }
@@ -101,7 +101,10 @@ select_ci_exon <- function(my_gene, all_introns, all_exons){
     unique() |>
     setdiff(exons_with_alt_ss) |>
     setdiff(exons_skippable)
-  internal_constitutive_exons
+  
+  if(length(internal_constitutive_exons) == 0L){
+    return(tibble())
+  }
   
   # select one exon randomly
   selected_exon <- sample(internal_constitutive_exons, 1)
