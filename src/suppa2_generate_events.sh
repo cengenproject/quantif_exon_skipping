@@ -56,11 +56,13 @@ Rscript src/generate_CI_events.R \
 
 # BED file for inclusion (exonic) reads, contains coords of central exon (the one that can be skipped)
 cat $out_dir/${WS}_SE_coords.tab \
+    | tail -n +2 \
     | awk -v'OFS=\t' '{print($3, $7, $8, $1, 0, $4)}' \
     > $out_dir/${WS}_SE_central_exon.bed
 
 # junctions tab file to match the ones created by STAR, with the coords of the intron
 cat $out_dir/${WS}_SE_coords.tab \
+    | tail -n +2 \
     | awk -v 'OFS=\t' '{print($3,$5+1, $6-1, $4=="+"? 1: 2)}' \
     > $out_dir/${WS}_SE_spanning_intron.tab
 

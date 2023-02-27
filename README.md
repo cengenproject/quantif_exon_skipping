@@ -11,13 +11,14 @@ out_dir="/home/aw853/scratch60/2022-11-03_bsn9/"
 
 use it to merge BAMs from technical replicates (using `samtools`), and merge SJs from technical replicates (using `src/combine_sj_files.R`).
 
+Note: this step takes ~ 10 min per sample, ~30 h total.
 
 ## SUPPA2 annotation
 
 In script `src/suppa2_generate_events.sh`, we run SUPPA2 to get SE (skipped exon) events annotation. It creates a tab file. In addition, calls `generate_CI_events.R` to extract an internal constitutive (CI) exon from the same genes as the SE. Finally, it makes two bed files from the tab file, to be used for quantification.
 
 
-Then `src/get_psi_for_SE.sh` counts inclusion and exclusion reads with `bedtools` and `grep`, starting with SE annotation bed, and calls `src/assemble_psi.R` to create the result `assembled_psi.tsv`.
+Then `src/get_psi_for_SE.sh` counts inclusion and exclusion reads with `bedtools` and `grep`, starting with SE annotation bed, and calls `src/assemble_psi.R` to create the result `assembled_psi.tsv`. Note: takes about 2.5 minutes/sample (8h total), and requires 200 GB memory for some samples.
 
 Finally, can use `R/format_SE_psi.R` (not on cluster) to load `assembled_psi.tsv`, Alec's sc-bulk integration thresholds for filtering, and export `events_coordinates.tsv` and `PSI_quantifications.tsv`.
 
