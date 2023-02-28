@@ -66,3 +66,5 @@ Rscript src/combine_sj_files.R \
 echo
 echo "All done $(date)"
 
+
+echo "TO DO manually: if needed, remove IL2r107 (no bam, only sj); remove outliers (AVKr113, PVMr122, RICr133)"

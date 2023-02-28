@@ -76,6 +76,11 @@ ggplot(psi_joint) +
 psi_export <- psi_joint |>
   filter(expression == 1L)
 
+# Remove outlier samples if not done previously
+outlier_samples <- c("AVKr113","RICr133","PVMr122")
+
+psi_export <- psi_export |>
+  filter(! sample_id %in% outlier_samples)
 
 # Convert into gene coordinates ----
 
