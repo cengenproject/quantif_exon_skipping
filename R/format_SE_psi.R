@@ -7,7 +7,7 @@ library(wbData)
 
 # Load and format data ----
 
-psi <- read_tsv("data/from_ruddle/2022-11-10_SE_PSI/assembled_psi.tsv",
+psi <- read_tsv("data/from_ruddle/2023-02-09_SE_PSI/assembled_psi.tsv",
                 col_types = cols(
                   name = col_character(),
                   gene = col_character(),
@@ -24,6 +24,8 @@ psi <- read_tsv("data/from_ruddle/2022-11-10_SE_PSI/assembled_psi.tsv",
          gene_id = gene) |>
   mutate(across(starts_with(c("ER", "IR")), as.integer)) |>
   arrange(chr, startExon, endExon)
+
+stop_for_problems(psi)
 
 psi_long <- pivot_longer(psi,
                          starts_with(c("IR","ER","PSI")),
@@ -103,11 +105,11 @@ psi_export <- psi_export |>
 psi_export |>
   select(event_id, intron_start, intron_end, exon_start, exon_end, gene_length, gene_id) |>
   distinct() |>
-  write_tsv("data/export_for_arman/221111_events_coordinates.tsv")
+  write_tsv("data/export_for_arman/230228_events_coordinates.tsv")
 
 psi_export |>
   select(event_id, sample_id, nb_reads, PSI) |>
-  write_tsv("data/export_for_arman/221110_PSI_quantifications.tsv")
+  write_tsv("data/export_for_arman/230228_PSI_quantifications.tsv")
 
   
 
