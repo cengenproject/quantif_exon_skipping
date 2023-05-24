@@ -44,5 +44,11 @@ MISO provides exon-centric [annotations for some organisms](https://miso.readthe
 Turns out rnaseqlib is old and unmaintained, installing and running it runs into problems, gave up. Instead, going with a more recent software, SUPPA2, that includes script for creating annotations. See top of the page.
 
 
+### SUPPA2 miniconda
 
+```
+conda create --name SUPPA2
+conda activate SUPPA2
+conda install -c bioconda suppa
+```
 
