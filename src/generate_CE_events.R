@@ -41,7 +41,9 @@ options(wb_dir_cache = paste0("/gpfs/ycga/project/ysm/hammarlund/aw853/reference
 
 
 # List genes that need an exon ----
-list_SE_genes <- readr::read_tsv(opt$tab_file, col_select = "gene", show_col_types = FALSE)$gene
+list_SE_genes <- read_tsv(opt$tab_file, show_col_types = FALSE) |>
+  filter(startsWith(name, "SE_")) |>
+  pull(gene)
 
 
 
