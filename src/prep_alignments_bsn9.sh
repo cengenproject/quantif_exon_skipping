@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --partition=general
+#SBATCH --partition=week
 #SBATCH --job-name=merge_index_bam
 #SBATCH -c 1
 #SBATCH --mem=25G
@@ -16,7 +16,7 @@ echo "Prepare alignments bsn9 starting $(date)"
 
 input_bams="/SAY/standard/mh588-CC1100-MEDGEN/bulk_alignments/bsn9_bams/"
 input_sj="/SAY/standard/mh588-CC1100-MEDGEN/bulk_alignments/bsn9_junctions/"
-out_dir="/home/aw853/scratch60/2023-02-09_bsn9/"
+out_dir="/home/aw853/scratch60/2023-05-24_bsn9/"
 
 
 ### Prepare metadata
