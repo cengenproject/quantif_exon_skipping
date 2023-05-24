@@ -15,7 +15,7 @@ Note: this step takes ~ 10 min per sample, ~30 h total.
 
 ## SUPPA2 annotation
 
-In script `src/suppa2_generate_events.sh`, we run SUPPA2 to get SE (skipped exon) events annotation. It creates a tab file. In addition, calls `generate_CI_events.R` to extract an internal constitutive (CI) exon from the same genes as the SE. Finally, it makes two bed files from the tab file, to be used for quantification.
+In script `src/suppa2_generate_events.sh`, we run SUPPA2 to get SE (skipped exon) events annotation. It creates a tab file. In addition, calls `generate_CI_events.R` and `generate_CE_events.R` to extract constitutively included (CI) and excluded (CE) exons from the same genes as the SE. Finally, it makes two bed files from the tab file, to be used for quantification.
 
 
 Then `src/get_psi_for_SE.sh` counts inclusion and exclusion reads with `bedtools` and `grep`, starting with SE annotation bed, and calls `src/assemble_psi.R` to create the result `assembled_psi.tsv`. Note: takes about 2.5 minutes/sample (8h total), and requires 200 GB memory for some samples.
