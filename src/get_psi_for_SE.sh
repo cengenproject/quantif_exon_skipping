@@ -3,7 +3,7 @@
 #SBATCH --job-name=psi
 #SBATCH -c 1
 #SBATCH --mem=210G
-#SBATCH --time=1-10:10:00
+#SBATCH --time=24:00:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=alexis.weinreb@yale.edu
 
@@ -32,15 +32,16 @@ WS="WS281"
 readLength=101
 
 
-SE_annot="data/suppa2_data/230209_events/${WS}_"
+SE_annot="data/suppa2_data/230524_events/${WS}_"
 
 
 data_dir="/home/aw853/scratch60/2023-02-09_bsn9"
-out_dir="data/2023-02-09_SE_PSI"
-tmp_dir="/home/aw853/scratch60/230209_SE_PSI_all_samples"
+out_dir="data/2023-05-24_SE_PSI"
+tmp_dir="/home/aw853/scratch60/230524_SE_PSI_all_samples"
 
 mkdir -p $out_dir
 
+mkdir -p $tmp_dir
 rm -r $tmp_dir
 mkdir -p $tmp_dir
 
