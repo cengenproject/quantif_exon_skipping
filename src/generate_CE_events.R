@@ -118,7 +118,8 @@ find_internal_ss_pair <- function(intron_seq, strand){
 
 
 
-select_ce_exon <- function(my_gene, all_introns, all_exons){
+select_ce_exon <- possibly(otherwise = tibble(),
+                           .f = function(my_gene, all_introns, all_exons){
   
   # introns that don't intersect with exon
   introns <- all_introns[[my_gene]] |>
@@ -166,7 +167,7 @@ select_ce_exon <- function(my_gene, all_introns, all_exons){
                   startExon = startLong + start(potential_exons[[.x$intron]])[[.x$view_nb_in_intron]] - 1,
                   endExon = startLong + end(potential_exons[[.x$intron]])[[.x$view_nb_in_intron]])
     )()
-}
+})
 
 
 
@@ -177,7 +178,7 @@ select_ce_exon <- function(my_gene, all_introns, all_exons){
 
 # run function
 set.seed(123)
-CE_coords <- map_dfr(list_SE_genes[1:10], select_ce_exon, all_introns, all_exons,
+CE_coords <- map_dfr(list_SE_genes, select_ce_exon, all_introns, all_exons,
                      .progress = TRUE)
 
 CE_coords <- mutate(CE_coords,

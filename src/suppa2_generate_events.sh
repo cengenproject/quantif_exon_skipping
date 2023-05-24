@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --partition=general
+#SBATCH --partition=day
 #SBATCH --job-name=suppa_genEvents
 #SBATCH -c 1
 #SBATCH --mem=2G
