@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --partition=day
+#SBATCH --partition=general
 #SBATCH --job-name=suppa_genEvents
 #SBATCH -c 1
 #SBATCH --mem=2G
@@ -20,7 +20,7 @@ WS="WS281"
 ref_dir="/gpfs/ycga/project/ysm/hammarlund/aw853/references/$WS"
 ref_gtf=$ref_dir"/c_elegans.PRJNA13758.${WS}.canonical_geneset.gtf"
 
-out_dir="data/suppa2_data/230524_events"
+out_dir="data/suppa2_data/230531_events"
 
 mkdir -p $out_dir
 
