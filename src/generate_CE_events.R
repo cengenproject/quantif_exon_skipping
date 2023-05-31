@@ -102,11 +102,11 @@ all_exons <- GenomicFeatures::exonsBy(txdb, "gene")[list_SE_genes]
 
 find_internal_ss_pair <- function(intron_seq, strand){
   if(strand == "+"){
-    matches <- Biostrings::matchLRPatterns(Lpattern = "GT", Rpattern = "AG",
+    matches <- Biostrings::matchLRPatterns(Lpattern = "AG", Rpattern = "GT",
                                            max.gaplength = length(intron_seq),
                                            subject = intron_seq)
   } else if(strand == "-"){
-    matches <- Biostrings::matchLRPatterns(Lpattern = "CT", Rpattern = "AC",
+    matches <- Biostrings::matchLRPatterns(Lpattern = "AC", Rpattern = "CT",
                                            max.gaplength = length(intron_seq),
                                            subject = intron_seq)
   } else{
@@ -162,10 +162,10 @@ select_ce_exon <- possibly(otherwise = tibble(),
     (\(.x) tibble(gene = my_gene,
                   chr = seqnames(introns) |> runValue() |> as.character(),
                   strand = strand(introns) |> runValue() |> as.character(),
-                  startLong = start(introns[.x$intron]),
-                  endLong = end(introns[.x$intron]),
-                  startExon = startLong + start(potential_exons[[.x$intron]])[[.x$view_nb_in_intron]] - 1,
-                  endExon = startLong + end(potential_exons[[.x$intron]])[[.x$view_nb_in_intron]])
+                  startLong = start(introns[.x$intron]) - 1L,
+                  endLong = end(introns[.x$intron]) + 1L,
+                  startExon = startLong+1L + start(potential_exons[[.x$intron]])[[.x$view_nb_in_intron]] + 2L,
+                  endExon = startLong+1L + end(potential_exons[[.x$intron]])[[.x$view_nb_in_intron]] - 2L)
     )()
 })
 

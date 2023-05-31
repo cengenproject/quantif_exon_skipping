@@ -123,8 +123,8 @@ select_ci_exon <- function(my_gene, all_introns, all_exons){
   tibble(gene = my_gene,
          chr = seqnames(exons) |> runValue() |> as.character(),
          strand = strand(exons) |> runValue() |> as.character(),
-         startLong = min(start(flanking_introns)),
-         endLong = max(end(flanking_introns)),
+         startLong = min(start(flanking_introns)) - 1L,
+         endLong = max(end(flanking_introns)) + 1L,
          startExon = start(exons[selected_exon,]),
          endExon = end(exons[selected_exon,]))
 }
