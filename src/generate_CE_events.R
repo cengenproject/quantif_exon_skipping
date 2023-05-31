@@ -139,6 +139,7 @@ select_ce_exon <- possibly(otherwise = tibble(),
   
   
   # we have a list of many potential exons, now we should give them scores and pick one
+  # a score at 0 is disqualifying, otherwise we favor higher scores
   
   imap_dfr(potential_exons,
            ~ tibble(intron = .y,
@@ -157,15 +158,15 @@ select_ce_exon <- possibly(otherwise = tibble(),
                                 gc_content > .25 & gc_content < .65 ~ 1,
                                 .default = 0),
            score_total = score_width + score_gc) |>
-    filter(score_total > 0) |>
+    filter(if_all(starts_with("score_"), ~ .x > 0)) |>
     slice_sample(n = 1, weight_by = exp(score_total) ) |>
     (\(.x) tibble(gene = my_gene,
                   chr = seqnames(introns) |> runValue() |> as.character(),
                   strand = strand(introns) |> runValue() |> as.character(),
                   startLong = start(introns[.x$intron]) - 1L,
                   endLong = end(introns[.x$intron]) + 1L,
-                  startExon = startLong+1L + start(potential_exons[[.x$intron]])[[.x$view_nb_in_intron]] + 2L,
-                  endExon = startLong+1L + end(potential_exons[[.x$intron]])[[.x$view_nb_in_intron]] - 2L)
+                  startExon = startLong+1L + start(potential_exons[[.x$intron]])[[.x$view_nb_in_intron]] + 1L,
+                  endExon = startLong+1L + end(potential_exons[[.x$intron]])[[.x$view_nb_in_intron]] - 3L)
     )()
 })
 
