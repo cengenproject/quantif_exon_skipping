@@ -32,12 +32,12 @@ WS="WS281"
 readLength=101
 
 
-SE_annot="data/suppa2_data/230524_events/${WS}_"
+SE_annot="data/suppa2_data/230531_events/${WS}_"
 
 
-data_dir="/home/aw853/scratch60/2023-02-09_bsn9"
-out_dir="data/2023-05-24_SE_PSI"
-tmp_dir="/home/aw853/scratch60/230524_SE_PSI_all_samples"
+data_dir="/home/aw853/scratch60/2023-05-24_bsn9"
+out_dir="data/2023-05-31_SE_PSI"
+tmp_dir="/home/aw853/scratch60/230531_SE_PSI_all_samples"
 
 mkdir -p $out_dir
 
