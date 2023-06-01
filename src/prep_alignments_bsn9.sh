@@ -67,4 +67,4 @@ echo
 echo "All done $(date)"
 
 
-echo "TO DO manually: if needed, remove IL2r107 (no bam, only sj); remove outliers (AVKr113, PVMr122, RICr133)"
+echo "TO DO manually: if needed, remove IL1r107 (no bam, only sj); remove outliers (AVKr113, PVMr122, RICr133)"
