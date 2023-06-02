@@ -88,7 +88,7 @@ read_excl <- function(path){
                      endLong = col_integer(),
                      strand = col_factor(levels = c("1", "2")),
                      intron_motif = col_factor(levels = as.character(0:6)),
-                     annotated = col_factor(levels = c("1", "2")),
+                     annotated = col_factor(levels = c("0", "1")),
                      unimappers = col_integer()
                    )) |>
     mutate(strand = recode_factor(strand,
