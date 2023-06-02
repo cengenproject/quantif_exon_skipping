@@ -7,7 +7,7 @@ library(wbData)
 
 # Load and format data ----
 
-psi <- read_tsv("data/from_ruddle/2022-11-10_SE_PSI/assembled_psi.tsv",
+psi <- read_tsv("data/from_ruddle/2023-05-31_SE_PSI/assembled_psi.tsv",
                 col_types = cols(
                   name = col_character(),
                   gene = col_character(),
