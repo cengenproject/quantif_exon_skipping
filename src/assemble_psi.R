@@ -95,8 +95,7 @@ read_excl <- function(path){
                                   "1" = "+",
                                   "2" = "-"),
            startLong = startLong - 1,
-           endLong = endLong + 1) |>
-    filter(annotated == "1")
+           endLong = endLong + 1)
   stop_for_problems(excl)
   
   
