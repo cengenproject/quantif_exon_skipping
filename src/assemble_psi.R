@@ -22,10 +22,10 @@ library(optparse)
 # Inputs
 if(interactive()){
   opt <- list(
-    se = "/home/aw853/project/exon_skipping/data/suppa2_data/221108_events/WS281_SE_coords.tab",
+    se = "/home/aw853/project/quantif_exon_skipping/data/suppa2_data/230531_events/WS281_SE_coords.tab",
     read_len = 101,
-    inputs = "/home/aw853/scratch60/221108_SE_PSI",
-    out_dir = "/home/aw853/scratch60/221108_SE_PSI"
+    inputs = "/home/aw853/scratch60/230531_SE_PSI_all_samples",
+    out_dir = "/home/aw853/project/quantif_exon_skipping/data/2023-05-31_SE_PSI"
   )
 } else{
   
@@ -88,18 +88,17 @@ read_excl <- function(path){
                      endLong = col_integer(),
                      strand = col_factor(levels = c("1", "2")),
                      intron_motif = col_factor(levels = as.character(0:6)),
-                     annotated = col_factor(levels = c("1", "2")),
+                     annotated = col_factor(levels = c("0", "1")),
                      unimappers = col_integer()
                    )) |>
     mutate(strand = recode_factor(strand,
                                   "1" = "+",
                                   "2" = "-"),
            startLong = startLong - 1,
-           endLong = endLong + 1)
+           endLong = endLong + 1) |>
+    filter(annotated == "1")
   stop_for_problems(excl)
   
-  # should all be annotated
-  stopifnot(sum(excl$annotated == 1) == nrow(excl))
   
   excl
 }
