@@ -1,7 +1,9 @@
 # Quantification of exon skipping
 
 
-First, if necessary, run `prep_alignments_bsn9.sh` to assemble the bams and sj files from bsn9, store them on scratch60. It uses `samtools` and `src/combine_sj_files.R`
+
+
+First, if necessary, run `prep_alignments_bsn9.sh` to assemble the bams and sj files from bsn9, store them on scratch60. It uses `samtools` and `src/combine_sj_files.R`. Important: McCleary doesn't have access to /SAY anymore, so the first step is to transfer all the bam files to scratch60, then assemble them.
 
 ```
 input_bams="/SAY/standard/mh588-CC1100-MEDGEN/bulk_alignments/bsn9_bams/"
