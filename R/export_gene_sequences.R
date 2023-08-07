@@ -45,3 +45,16 @@ names(gseq) <- gene_coords_filt$gene_id
 # R.utils::gzip("data/intermediates_for_DL/220920_gene_sequences.fa")
 
 
+# # Save to disk unfiltered
+gr <- GRanges(seqnames = gene_coords$chr,
+              strand = gene_coords$strand,
+              IRanges(gene_coords$start, gene_coords$end),
+              names = gene_coords$gene_id)
+
+gseq <- Biostrings::getSeq(fasta, gr)
+names(gseq) <- gene_coords$gene_id
+
+Biostrings::writeXStringSet(gseq, "data/intermediates_for_DL/230807_all_gene_sequences.fa")
+
+R.utils::gzip("data/intermediates_for_DL/230807_all_gene_sequences.fa")
+
