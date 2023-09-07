@@ -121,14 +121,19 @@ find_internal_ss_pair <- function(intron_seq, strand){
 select_ce_exon <- possibly(otherwise = tibble(),
                            .f = function(my_gene, all_introns, all_exons){
   
-  # introns that don't intersect with exon
+  # introns that don't intersect with exon or other intron
   introns <- all_introns[[my_gene]] |>
     unlist() |>
     unique()
-  intersecting <- GenomicRanges::findOverlaps(introns,
+  intersecting_with_exon <- GenomicRanges::findOverlaps(introns,
                                               all_exons[[my_gene]] |> unique()) |>
     from()
-  introns <- introns[-intersecting]
+  intersecting_with_intron <- GenomicRanges::findOverlaps(introns,
+                                                          introns) |>
+    (\(hits) hits[from(hits) != to(hits)])() |>
+    from()
+  
+  introns <- introns[-union(intersecting_with_exon, intersecting_with_intron)]
   
   
   potential_exons <- map2(dna_seq[introns],
