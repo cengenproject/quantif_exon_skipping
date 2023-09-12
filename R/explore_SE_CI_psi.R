@@ -2,7 +2,7 @@
 
 library(tidyverse)
 
-psi <- read_tsv("data/export_for_arman/230531_PSI_quantifications.tsv") |>
+psi <- read_tsv("data/export_for_arman/230907_PSI_quantifications.tsv") |>
   mutate(type = str_match(event_id, "^(CI|SE|CE)_[0-9]+$")[,2],
          type = factor(type, levels = c("SE","CI","CE")))
 
@@ -27,17 +27,67 @@ ggplot(psi) +
   xlab("Number of supporting reads")
 
 
-
+# only high-quality events
 psi |>
-  filter(nb_reads > 4) |>
+  filter(nb_reads > 10) |>
   ggplot() +
   theme_classic() +
   geom_histogram(aes(x = PSI), color = 'white') +
   facet_wrap(~type)
 
 
+# Compare with older versions ----
 
-# Compare with previous version (without CE), to make sure rerunning everything didn't introduce new problems
+#~ 230531 ----
+
+psi_old <- read_tsv("data/export_for_arman/230531_PSI_quantifications.tsv") |>
+  mutate(type = str_match(event_id, "^(CI|SE|CE)_[0-9]+$")[,2],
+         type = factor(type, levels = c("SE","CI","CE")))
+psi_new <- psi
+
+# only CE changed
+table(psi_old$type, useNA = 'ifany')
+table(psi_new$type, useNA = 'ifany')
+
+all.equal(
+  psi_old |> filter(type != "CE"),
+  psi_new |> filter(type != "CE")
+)
+
+
+ggplot(psi_old) +
+  theme_classic() +
+  geom_histogram(aes(x = PSI), color = 'white') +
+  facet_wrap(~type)
+
+ggplot(psi_new) +
+  theme_classic() +
+  geom_histogram(aes(x = PSI), color = 'white') +
+  facet_wrap(~type)
+
+bind_rows(
+  psi_old |> filter(type == "CE") |> add_column(version = "old"),
+  psi_new |> filter(type == "CE") |> add_column(version = "new")
+) |>
+  ggplot() +
+  theme_classic() +
+  geom_density(aes(x = PSI, fill = version), alpha = .2)
+
+# the cases that shouldn't happen too much
+psi_new |> filter(type == "CE", PSI > .9, nb_reads > 10)
+psi_old |> filter(type == "CE", PSI > .9, nb_reads > 10)
+
+psi_old |> filter(type == "CE", PSI > .9, nb_reads > 10) |>
+  count(event_id)
+
+psi_new |> filter(type == "CE", PSI > .9, nb_reads > 10) |>
+  count(event_id)
+
+
+
+#~ 230228 ----
+
+#  Compare with previous version (without CE), to make sure rerunning everything didn't introduce new problems
 
 psi_old <- read_tsv("data/export_for_arman/230228_PSI_quantifications.tsv") |>
   as_tibble() # necessray to remove {readr}-specific spec_tbl_df
@@ -75,7 +125,7 @@ psi_new
 
 # Check coordinates ----
 
-coords <- read_tsv("data/export_for_arman/230531_events_coordinates.tsv")
+coords <- read_tsv("data/export_for_arman/230907_events_coordinates.tsv")
 
 # frm-5.2
 coords |> filter(gene_id == "WBGene00021406")
@@ -107,4 +157,50 @@ gene_coords[["WBGene00016022"]][2331:3551]
 gene_coords[["WBGene00016022"]][2375:2488]
 
 
+# Check weird cases
+psi |> filter(type == "CE", PSI > .9, nb_reads > 10)
+
+# e.g. CE_980 in ADLr171
+coords |> filter(event_id == "CE_980")
+#> due to alt 5' ss unannotated but highly used in ADL
+
+# e.g. CE_671 in LUAr
+coords |> filter(event_id == "CE_671")
+#> gene not expressed, so no excl reads,
+#> but noisy for some reason, so some incl reads
+
+# e.g. CE_55
+coords |> filter(event_id == "CE_55")
+#> the fake exon ends up on top of a highly expressed snoRNA
+
+
+# Exons properties ----
+eulerr::euler(list(coords = unique(coords$event_id), psi = unique(psi$event_id))) |> plot()
+
+
+#~ length ----
+
+
+
+
+coords_annot <- coords |>
+  mutate(event_type = str_match(event_id, "^(CI|SE|CE)_[0-9]+$")[,2],
+         exon_length = exon_end - exon_start + 1,
+         upstream_intron_length = intron_end - exon_end + 1,
+         downstream_intron_length = exon_start - intron_start + 1) |>
+  left_join(psi |>
+              filter(nb_reads > 10) |>
+              group_by(event_id) |>
+              summarize(dPSI = diff(range(PSI, na.rm = TRUE))),
+            by = "event_id")
+
+ggplot(coords_annot) +
+  theme_classic() +
+  facet_wrap(~event_type) +
+  geom_histogram(aes(x = dPSI))
+
+ggplot(coords_annot) +
+  theme_classic() +
+  geom_freqpoly(aes(x = exon_length, color = event_type)) +
+  scale_x_log10()
 
