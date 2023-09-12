@@ -64,10 +64,11 @@ all_introns <- purrr::map(wb_g2tx(list_SE_genes, tx2g, warn_missing = TRUE),
                    ~ all_introns_genome[.x])
 
 
-all_exons <- GenomicFeatures::exonsBy(txdb, "gene")[list_SE_genes]
+all_exons <- GenomicFeatures::exonsBy(txdb, "gene")
 
 
 # # Look at real data to define scores
+# all_exons <- GenomicFeatures::exonsBy(txdb, "gene")[list_SE_genes]
 # unlist(all_exons) |>
 #   width() |>
 #   log10() |>
@@ -126,7 +127,7 @@ select_ce_exon <- possibly(otherwise = tibble(),
     unlist() |>
     unique()
   intersecting_with_exon <- GenomicRanges::findOverlaps(introns,
-                                              all_exons[[my_gene]] |> unique()) |>
+                                              unlist(all_exons) |> unique()) |>
     from()
   intersecting_with_intron <- GenomicRanges::findOverlaps(introns,
                                                           introns) |>
