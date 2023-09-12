@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --partition=general
+#SBATCH --partition=week
 #SBATCH --job-name=merge_index_bam
 #SBATCH -c 1
 #SBATCH --mem=25G
-#SBATCH --time=5-00:10:00
+#SBATCH --time=3-00:10:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=alexis.weinreb@yale.edu
 
@@ -14,9 +14,9 @@
 echo "Prepare alignments bsn9 starting $(date)"
 
 
-input_bams="/SAY/standard/mh588-CC1100-MEDGEN/bulk_alignments/bsn9_bams/"
-input_sj="/SAY/standard/mh588-CC1100-MEDGEN/bulk_alignments/bsn9_junctions/"
-out_dir="/home/aw853/scratch60/2023-05-24_bsn9/"
+input_bams="/gpfs/gibbs/pi/hammarlund/CeNGEN/bulk/bulk_alignments/bsn9_bams"
+input_sj="/gpfs/gibbs/pi/hammarlund/CeNGEN/bulk/bulk_alignments/bsn9_junctions"
+out_dir="/vast/palmer/scratch/hammarlund/aw853/2023-05-24_bsn9/"
 
 
 ### Prepare metadata

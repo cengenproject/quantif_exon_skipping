@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --partition=bigmem
+#SBATCH --partition=day
 #SBATCH --job-name=psi
 #SBATCH -c 1
 #SBATCH --mem=210G
-#SBATCH --time=24:00:00
+#SBATCH --time=23:50:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=alexis.weinreb@yale.edu
 
@@ -32,12 +32,12 @@ WS="WS281"
 readLength=101
 
 
-SE_annot="data/suppa2_data/230531_events/${WS}_"
+SE_annot="data/suppa2_data/230907_events/${WS}_"
 
 
-data_dir="/home/aw853/scratch60/2023-05-24_bsn9"
-out_dir="data/2023-05-31_SE_PSI"
-tmp_dir="/home/aw853/scratch60/230531_SE_PSI_all_samples"
+data_dir="/vast/palmer/scratch/hammarlund/aw853/2023-05-24_bsn9"
+out_dir="data/2023-09-07_SE_PSI"
+tmp_dir="/vast/palmer/scratch/hammarlund/aw853/230907_SE_PSI_all_samples"
 
 mkdir -p $out_dir
 
