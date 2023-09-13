@@ -20,7 +20,7 @@ WS="WS281"
 ref_dir="/gpfs/ycga/project/ysm/hammarlund/aw853/references/$WS"
 ref_gtf=$ref_dir"/c_elegans.PRJNA13758.${WS}.canonical_geneset.gtf"
 
-out_dir="data/suppa2_data/230907_events"
+out_dir="data/suppa2_data/230912_events"
 
 mkdir -p $out_dir
 

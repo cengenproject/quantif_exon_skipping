@@ -32,12 +32,12 @@ WS="WS281"
 readLength=101
 
 
-SE_annot="data/suppa2_data/230907_events/${WS}_"
+SE_annot="data/suppa2_data/230912_events/${WS}_"
 
 
 data_dir="/vast/palmer/scratch/hammarlund/aw853/2023-05-24_bsn9"
-out_dir="data/2023-09-07_SE_PSI"
-tmp_dir="/vast/palmer/scratch/hammarlund/aw853/230907_SE_PSI_all_samples"
+out_dir="data/2023-09-12_SE_PSI"
+tmp_dir="/vast/palmer/scratch/hammarlund/aw853/230912_SE_PSI_all_samples"
 
 mkdir -p $out_dir
 
