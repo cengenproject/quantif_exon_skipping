@@ -1,8 +1,9 @@
 # Very quick exploration of the PSI values (note, deeper analyses in other projects)
 
+# Inits ----
 library(tidyverse)
 
-psi <- read_tsv("data/export_for_arman/230907_PSI_quantifications.tsv") |>
+psi <- read_tsv("data/export_for_arman/230912_PSI_quantifications.tsv") |>
   mutate(type = str_match(event_id, "^(CI|SE|CE)_[0-9]+$")[,2],
          type = factor(type, levels = c("SE","CI","CE")))
 
@@ -37,6 +38,54 @@ psi |>
 
 
 # Compare with older versions ----
+
+#~ 230907
+
+psi_old <- read_tsv("data/export_for_arman/230907_PSI_quantifications.tsv") |>
+  mutate(type = str_match(event_id, "^(CI|SE|CE)_[0-9]+$")[,2],
+         type = factor(type, levels = c("SE","CI","CE")))
+psi_new <- psi
+
+# only CE changed
+table(psi_old$type, useNA = 'ifany')
+table(psi_new$type, useNA = 'ifany')
+
+all.equal(
+  psi_old |> filter(type != "CE"),
+  psi_new |> filter(type != "CE")
+)
+
+
+ggplot(psi_old) +
+  theme_classic() +
+  geom_histogram(aes(x = PSI), color = 'white') +
+  facet_wrap(~type)
+
+ggplot(psi_new) +
+  theme_classic() +
+  geom_histogram(aes(x = PSI), color = 'white') +
+  facet_wrap(~type)
+
+bind_rows(
+  psi_old |> filter(type == "CE") |> add_column(version = "old"),
+  psi_new |> filter(type == "CE") |> add_column(version = "new")
+) |>
+  ggplot() +
+  theme_classic() +
+  geom_density(aes(x = PSI, fill = version), alpha = .2)
+
+# the cases that shouldn't happen too much
+psi_new |> filter(type == "CE", PSI > .9, nb_reads > 10)
+psi_old |> filter(type == "CE", PSI > .9, nb_reads > 10)
+
+psi_old |> filter(type == "CE", PSI > .9, nb_reads > 10) |>
+  count(event_id)
+
+psi_new |> filter(type == "CE", PSI > .9, nb_reads > 10) |>
+  count(event_id)
+
+
+
 
 #~ 230531 ----
 
@@ -125,7 +174,7 @@ psi_new
 
 # Check coordinates ----
 
-coords <- read_tsv("data/export_for_arman/230907_events_coordinates.tsv")
+coords <- read_tsv("data/export_for_arman/230912_events_coordinates.tsv")
 
 # frm-5.2
 coords |> filter(gene_id == "WBGene00021406")
@@ -172,6 +221,16 @@ coords |> filter(event_id == "CE_671")
 # e.g. CE_55
 coords |> filter(event_id == "CE_55")
 #> the fake exon ends up on top of a highly expressed snoRNA
+
+
+# CE_1010
+coords |> filter(event_id == "CE_1010")
+
+# CE_649, 597, 669
+coords |> filter(event_id == "CE_649")
+coords |> filter(event_id == "CE_597")
+coords |> filter(event_id == "CE_669")
+
 
 
 # Exons properties ----
