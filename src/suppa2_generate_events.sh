@@ -2,7 +2,7 @@
 #SBATCH --partition=day
 #SBATCH --job-name=suppa_genEvents
 #SBATCH -c 1
-#SBATCH --mem=2G
+#SBATCH --mem=8G
 #SBATCH --time=30:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=alexis.weinreb@yale.edu
@@ -16,11 +16,11 @@ module load miniconda
 conda activate SUPPA2
 
 
-WS="WS281"
+WS="WS289"
 ref_dir="/gpfs/ycga/project/ysm/hammarlund/aw853/references/$WS"
 ref_gtf=$ref_dir"/c_elegans.PRJNA13758.${WS}.canonical_geneset.gtf"
 
-out_dir="data/suppa2_data/230912_events"
+out_dir="data/suppa2_data/231109_events"
 
 mkdir -p $out_dir
 
