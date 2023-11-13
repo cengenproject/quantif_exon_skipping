@@ -2,7 +2,7 @@
 #SBATCH --partition=day
 #SBATCH --job-name=psi
 #SBATCH -c 1
-#SBATCH --mem=210G
+#SBATCH --mem=310G
 #SBATCH --time=23:50:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=alexis.weinreb@yale.edu
@@ -28,16 +28,17 @@ set -ue
 module load BEDTools
 
 
-WS="WS281"
+WS="WS289"
 readLength=101
 
 
-SE_annot="data/suppa2_data/230912_events/${WS}_"
+SE_annot="data/suppa2_data/231109_events/${WS}_"
 
 
-data_dir="/vast/palmer/scratch/hammarlund/aw853/2023-05-24_bsn9"
-out_dir="data/2023-09-12_SE_PSI"
-tmp_dir="/vast/palmer/scratch/hammarlund/aw853/230912_SE_PSI_all_samples"
+bam_dir="/gpfs/gibbs/pi/hammarlund/CeNGEN/bulk/bulk_alignments/bsn12_bams"
+sj_dir="/vast/palmer/scratch/hammarlund/aw853/2023-11-08_bsn12/junctions"
+out_dir="data/2023-11-09_SE_PSI"
+tmp_dir="/vast/palmer/scratch/hammarlund/aw853/231109_SE_PSI_all_samples"
 
 mkdir -p $out_dir
 
@@ -46,12 +47,12 @@ rm -r $tmp_dir
 mkdir -p $tmp_dir
 
 
-mapfile -t bamList < <(ls $data_dir/bams/*.bam \
+mapfile -t bamList < <(ls $bam_dir/*.bam \
                           | xargs basename -a -s .bam \
                           | cut -f1 -d't'\
                           | uniq)
 
-mapfile -t sjList < <(ls $data_dir/junctions/*.SJ.tab \
+mapfile -t sjList < <(ls $sj_dir/*.SJ.tab \
                           | xargs basename -a -s .SJ.tab \
                           | cut -f1 -d't'\
                           | uniq)
@@ -77,8 +78,8 @@ do
   
   echo "------   Sample $sample   ------"
   
-  my_bam=$data_dir/bams/$sample.bam
-  my_SJ_tab=$data_dir/junctions/$sample.SJ.tab
+  my_bam=$bam_dir/$sample.bam
+  my_SJ_tab=$sj_dir/$sample.SJ.tab
   
   s=$tmp_dir/$sample
   
@@ -114,10 +115,11 @@ module swap BEDTools R
 
 Rscript src/assemble_psi.R \
         --se ${SE_annot}SE_coords.tab \
-        --read_len 101 \
+        --read_len $readLength \
         --inputs $tmp_dir \
         --out $out_dir
 
 
 
 echo "Ending $(date)"
+
