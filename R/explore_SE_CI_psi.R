@@ -3,9 +3,15 @@
 # Inits ----
 library(tidyverse)
 
-psi <- read_tsv("data/export_for_arman/230912_PSI_quantifications.tsv") |>
+psi <- read_tsv("data/export_for_arman/240308_PSI_quantifications.tsv") |>
   mutate(type = str_match(event_id, "^(CI|SE|CE)_[0-9]+$")[,2],
          type = factor(type, levels = c("SE","CI","CE")))
+
+coords <- read_tsv("data/export_for_arman/240308_events_coordinates.tsv")
+
+
+
+
 
 table(psi$type, useNA = 'ifany')
 
@@ -38,6 +44,55 @@ psi |>
 
 
 # Compare with older versions ----
+
+
+
+
+
+#~ 230912 ----
+
+psi_old <- read_tsv("data/export_for_arman/230912_PSI_quantifications.tsv") |>
+  mutate(type = str_match(event_id, "^(CI|SE|CE)_[0-9]+$")[,2],
+         type = factor(type, levels = c("SE","CI","CE")))
+psi_new <- psi
+
+old_ev_coords <- read_tsv("data/export_for_arman/230912_events_coordinates.tsv")
+
+new_old_correspondance <- right_join(coords, old_ev_coords |> rename(old_id = event_id),
+          by = c("intron_start", "intron_end", "exon_start", "exon_end",
+                 "gene_length", "gene_id"),
+          relationship = "many-to-many") |>
+  filter(!is.na(event_id)) |>
+  select(new_id = event_id,
+         old_id)
+
+psi_old <- psi_old |>
+  left_join(new_old_correspondance,
+            by = c(event_id = "old_id"),
+            relationship = "many-to-many") |>
+  select(-event_id) |>
+  rename(event_id = new_id)
+
+
+left_join(
+  psi_old |> filter(type == "CI"),
+  psi_new |> filter(type == "CI"),
+  by = c("event_id", "sample_id", "type")
+) |>
+  ggplot() +
+  theme_classic() +
+  geom_point(aes(x = PSI.x, y = PSI.y), alpha = .1)
+
+left_join(
+  psi_old |> filter(type == "CE"),
+  psi_new |> filter(type == "CE"),
+  by = c("event_id", "sample_id", "type")
+) |> filter(PSI.x <.01, PSI.y == 1)
+
+
+
+
+
 
 #~ 230907
 
@@ -73,6 +128,8 @@ bind_rows(
   ggplot() +
   theme_classic() +
   geom_density(aes(x = PSI, fill = version), alpha = .2)
+
+
 
 # the cases that shouldn't happen too much
 psi_new |> filter(type == "CE", PSI > .9, nb_reads > 10)
@@ -134,6 +191,7 @@ psi_new |> filter(type == "CE", PSI > .9, nb_reads > 10) |>
 
 
 
+
 #~ 230228 ----
 
 #  Compare with previous version (without CE), to make sure rerunning everything didn't introduce new problems
@@ -172,9 +230,12 @@ table(psi_new$PSI[startsWith(psi_new$event_id, "CI_")] < 1)
 psi_new
 
 
+
+
+
 # Check coordinates ----
 
-coords <- read_tsv("data/export_for_arman/230912_events_coordinates.tsv")
+
 
 # frm-5.2
 coords |> filter(gene_id == "WBGene00021406")
@@ -188,7 +249,7 @@ gene_coords <- Biostrings::readDNAStringSet("../stringtie_quantif/data/intermedi
 
 gene_coords[["WBGene00016022"]]
 
-# SE_936 intron
+# SE_946 intron
 gene_coords[["WBGene00016022"]][2331:4384]
 # exon
 gene_coords[["WBGene00016022"]][3552:3722]
@@ -207,7 +268,34 @@ gene_coords[["WBGene00016022"]][2375:2488]
 
 
 # Check weird cases
-psi |> filter(type == "CE", PSI > .9, nb_reads > 10)
+psi |> filter(type == "CE", PSI > .9, nb_reads > 10) |>
+  filter(event_id != "CE_657")
+
+
+# e.g. CE_657 in CEPr278
+coords |> filter(event_id == "CE_657")
+#> due to gene on other strand inside the intron
+
+# e.g. CE_677 === CE_678 in I5r210
+coords |> filter(event_id == "CE_677")
+#> due to noise (there is a weird bump around there,
+#> though gene likely not expressed, however there is an expressed ncRNA in its 3'UTR
+#> that may appear like expression in scRNA-Seq (though doesn't seem polyA, so unsure how))
+
+
+# e.g. CE_695 in ADLr172
+coords |> filter(event_id == "CE_695")
+#> some noise in an unexpressed region of the gene (so there is no exclusion read)
+#> it's an unexpressed region because of alt first exon: these neurons start the gene downstream
+
+
+
+
+
+
+
+
+# older versions below (230912)
 
 # e.g. CE_980 in ADLr171
 coords |> filter(event_id == "CE_980")

@@ -45,41 +45,41 @@ psi_long
 
 # Filter out the gene-neuron pairs that have no expression ----
 
-# # load Alec's sc-bulk integration
-# gene_expression <- read.csv("data/thresholded_gene_expression/bsn9_subtracted_integrated_binarized_expression_withVDDD_FDR_0.1_092022.tsv",
-#                             sep = "\t") |>
-#   rownames_to_column("gene_id") |>
-#   pivot_longer(-gene_id,
-#                names_to = "neuron_id",
-#                values_to = "expression")
-# 
-# 
-# 
-# # Clean up: if not present in gene_expression, almost surely not expressed in any neuron
-# psi_filt <- psi_long |>
-#   filter(neuron_id %in% gene_expression$neuron_id,
-#          gene_id %in% gene_expression$gene_id)
-# 
-# 
-# psi_joint <- left_join(psi_filt,
-#                       gene_expression,
-#                       by = c("gene_id", "neuron_id"))
-# 
-# 
-# 
-# ggplot(psi_joint) +
-#   # ggbeeswarm::geom_quasirandom(aes(x = as.character(expression), y = nb_reads)) +
-#   geom_violin(aes(x = as.character(expression), y = nb_reads)) +
-#   geom_boxplot(aes(x = as.character(expression), y = nb_reads), width = .2) +
-#   scale_y_log10()
-# 
-# psi_export <- psi_joint |>
-#   filter(expression == 1L)
+# load Alec's sc-bulk integration
+gene_expression <- read.csv("data/thresholded_gene_expression/bsn12_subtracted_integrated_binarized_expression_withVDDD_FDR0.05_030424.tsv",
+                            sep = "\t") |>
+  rownames_to_column("gene_id") |>
+  pivot_longer(-gene_id,
+               names_to = "neuron_id",
+               values_to = "expression")
+
+
+
+# Clean up: if not present in gene_expression, almost surely not expressed in any neuron
+psi_filt <- psi_long |>
+  filter(neuron_id %in% gene_expression$neuron_id,
+         gene_id %in% gene_expression$gene_id)
+
+
+psi_joint <- left_join(psi_filt,
+                      gene_expression,
+                      by = c("gene_id", "neuron_id"))
+
+
+
+ggplot(psi_joint) +
+  # ggbeeswarm::geom_quasirandom(aes(x = as.character(expression), y = nb_reads)) +
+  geom_violin(aes(x = as.character(expression), y = nb_reads)) +
+  geom_boxplot(aes(x = as.character(expression), y = nb_reads), width = .2) +
+  scale_y_log10()
+
+psi_export <- psi_joint |>
+  filter(expression == 1L)
 
 # Remove outlier samples if not done previously
 outlier_samples <- c("AVKr113","RICr133","PVMr122", "ASIr154")
 
-psi_export <- psi_long |>
+psi_export <- psi_export |>
   filter(! sample_id %in% outlier_samples)
 
 # Convert into gene coordinates ----
@@ -110,11 +110,11 @@ psi_export <- psi_export |>
 psi_export |>
   select(event_id, intron_start, intron_end, exon_start, exon_end, gene_length, gene_id) |>
   distinct() |>
-  write_tsv("data/export_for_arman/231214_events_coordinates_unfilt.tsv")
+  write_tsv("data/export_for_arman/240308_events_coordinates.tsv")
 
 psi_export |>
   select(event_id, sample_id, nb_reads, PSI) |>
-  write_tsv("data/export_for_arman/231214_PSI_quantifications_unfilt.tsv")
+  write_tsv("data/export_for_arman/240308_PSI_quantifications.tsv")
 
   
 
