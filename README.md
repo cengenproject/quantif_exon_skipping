@@ -3,26 +3,15 @@
 
 
 
-First, if necessary, run `prep_alignments_bsn9.sh` to assemble the bams and sj files from bsn9, store them on scratch60. It uses `samtools` and `src/combine_sj_files.R`. Important: McCleary doesn't have access to /SAY anymore, so the first step is to transfer all the bam files to scratch60, then assemble them.
-
-```
-input_bams="/SAY/standard/mh588-CC1100-MEDGEN/bulk_alignments/bsn9_bams/"
-input_sj="/SAY/standard/mh588-CC1100-MEDGEN/bulk_alignments/bsn9_junctions/"
-out_dir="/home/aw853/scratch60/2022-11-03_bsn9/"
-```
-
-use it to merge BAMs from technical replicates (using `samtools`), and merge SJs from technical replicates (using `src/combine_sj_files.R`).
-
-Note: this step takes ~ 10 min per sample, ~30 h total.
 
 ## SUPPA2 annotation
 
-In script `src/suppa2_generate_events.sh`, we run SUPPA2 to get SE (skipped exon) events annotation. It creates a tab file. In addition, calls `generate_CI_events.R` and `generate_CE_events.R` to extract constitutively included (CI) and excluded (CE) exons from the same genes as the SE. Finally, it makes two bed files from the tab file, to be used for quantification.
+In script `src/suppa2_generate_events.sh`, we run SUPPA2 to get SE (skipped exon) events annotation. It creates a tab file. In addition, it calls `generate_CI_events.R` and `generate_CE_events.R` to extract constitutively included (CI) and excluded (CE) exons from the same genes as the SE. Finally, it makes two bed files from the tab file, to be used for quantification.
 
 
-Then `src/get_psi_for_SE.sh` counts inclusion and exclusion reads with `bedtools` and `grep`, starting with SE annotation bed, and calls `src/assemble_psi.R` to create the result `assembled_psi.tsv`. Note: takes about 2.5 minutes/sample (8h total), and requires 200 GB memory for some samples.
+Then `src/get_psi_for_SE.sh` counts inclusion and exclusion reads with `bedtools` and `grep`, starting with SE annotation bed, and calls `src/assemble_psi.R` to create the result `assembled_psi.tsv`. Note: takes about 2.5 minutes/sample (8h total), and requires up to 200 GB memory for some samples.
 
-Finally, can use `R/format_SE_psi.R` (not on cluster) to load `assembled_psi.tsv`, Alec's sc-bulk integration thresholds for filtering, and export `events_coordinates.tsv` and `PSI_quantifications.tsv`.
+Finally (not on cluster), can use `R/format_SE_psi.R` to load `assembled_psi.tsv`, Alec's sc-bulk integration thresholds for filtering, and export `events_coordinates.tsv` and `PSI_quantifications.tsv`.
 
 
 ## Older approaches
@@ -54,3 +43,19 @@ conda activate SUPPA2
 conda install -c bioconda suppa
 ```
 
+### bsn9 prep annotations
+
+*Not necessary anymore for bsn12: the technical replicates are already merged, can use bams directly.*
+
+
+First, if necessary, run `prep_alignments_bsn9.sh` to assemble the bams and sj files from bsn9, store them on scratch60. It uses `samtools` and `src/combine_sj_files.R`. Important: McCleary doesn't have access to /SAY anymore, so the first step is to transfer all the bam files to scratch60, then assemble them.
+
+```
+input_bams="/SAY/standard/mh588-CC1100-MEDGEN/bulk_alignments/bsn9_bams/"
+input_sj="/SAY/standard/mh588-CC1100-MEDGEN/bulk_alignments/bsn9_junctions/"
+out_dir="/home/aw853/scratch60/2022-11-03_bsn9/"
+```
+
+use it to merge BAMs from technical replicates (using `samtools`), and merge SJs from technical replicates (using `src/combine_sj_files.R`).
+
+Note: this step takes ~ 10 min per sample, ~30 h total.
