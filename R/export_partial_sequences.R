@@ -20,19 +20,9 @@ gene_coords <- wb_load_gene_coords(281)
 
 
 
-# genes
-gr <- GRanges(seqnames = gene_coords$chr,
-              strand = gene_coords$strand,
-              IRanges(gene_coords$start, gene_coords$end),
-              names = gene_coords$gene_id)
-
-gseq <- Biostrings::getSeq(fasta, gr)
-names(gseq) <- gene_coords$gene_id
-
-
 
 # Events ----
-event_coords <- read_tsv("data/export_for_arman/230531_events_coordinates.tsv") |>
+event_coords <- read_tsv("data/export_for_arman/archive/230531_events_coordinates.tsv") |>
   left_join(gene_coords,
                            by = "gene_id") |>
 # to genomic coordinates
@@ -58,9 +48,9 @@ names(eseq) <- event_coords$event_id
 
 
 
-Biostrings::writeXStringSet(gseq, "data/intermediates_for_DL/240226_partial_sequences.fa")
+Biostrings::writeXStringSet(eseq, "data/intermediates_for_DL/240507_partial_sequences_match_230531_events.fa")
 
-R.utils::gzip("data/intermediates_for_DL/240226_partial_sequences.fa")
+R.utils::gzip("data/intermediates_for_DL/240507_partial_sequences_match_230531_events.fa")
 
 
 
