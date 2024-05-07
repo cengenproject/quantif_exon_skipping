@@ -14,6 +14,18 @@ Then `src/get_psi_for_SE.sh` counts inclusion and exclusion reads with `bedtools
 Finally (not on cluster), can use `R/format_SE_psi.R` to load `assembled_psi.tsv`, Alec's sc-bulk integration thresholds for filtering, and export `events_coordinates.tsv` and `PSI_quantifications.tsv`.
 
 
+
+# Versions
+
+* 230531: WS281, bsn9 alignments
+* 230907: updated CE
+* 230912: updated CE
+* 231109: WS289, bsn12 alignments
+* 231214: temporary export without filtering
+* 240308: quantifications (with proper filtering) of WS289, bsn12
+
+
+
 ## Older approaches
 
 ### Schafer (2015) method
