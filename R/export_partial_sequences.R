@@ -8,21 +8,23 @@ library(GenomicRanges)
 library(tidyverse)
 library(wbData)
 
-
+WS <- 289
+path_ev_coords <- "data/export_for_arman/240308_events_coordinates.tsv"
+path_export <- "data/intermediates_for_DL/240718_partial_sequences_match_240308_events.fa"
 
 #~ Load reference data ----
-fasta <- Rsamtools::FaFile(str_remove(wb_get_genome_path(281), "\\.gz$"))
+fasta <- Rsamtools::FaFile(str_remove(wb_get_genome_path(WS), "\\.gz$"))
 if(! file.exists(fasta$path)){
-  R.utils::gunzip(wb_get_genome_path(281))
+  R.utils::gunzip(wb_get_genome_path(WS))
 }
-gene_coords <- wb_load_gene_coords(281)
+gene_coords <- wb_load_gene_coords(WS)
 
 
 
 
 
 # Events ----
-event_coords <- read_tsv("data/export_for_arman/archive/230531_events_coordinates.tsv") |>
+event_coords <- read_tsv(path_ev_coords) |>
   left_join(gene_coords,
                            by = "gene_id") |>
 # to genomic coordinates
@@ -48,9 +50,9 @@ names(eseq) <- event_coords$event_id
 
 
 
-Biostrings::writeXStringSet(eseq, "data/intermediates_for_DL/240507_partial_sequences_match_230531_events.fa")
+Biostrings::writeXStringSet(eseq, path_export)
 
-R.utils::gzip("data/intermediates_for_DL/240507_partial_sequences_match_230531_events.fa")
+R.utils::gzip(path_export)
 
 
 
