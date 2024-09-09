@@ -20,7 +20,7 @@ WS="WS289"
 ref_dir="/gpfs/ycga/project/ysm/hammarlund/aw853/references/$WS"
 ref_gtf=$ref_dir"/c_elegans.PRJNA13758.${WS}.canonical_geneset.gtf"
 
-out_dir="data/suppa2_data/231109_events"
+out_dir="data/suppa2_data/240906_events"
 
 mkdir -p $out_dir
 
@@ -46,7 +46,7 @@ cat $out_dir/${WS}_SE_strict.ioe \
 
 
 # Find control exons in the same gene but constitutive, internal. Append to coords.tab file
-module swap miniconda R
+module swap miniconda R/4.2.0-foss-2020b
 Rscript src/generate_CI_events.R \
         --tab_file $out_dir/${WS}_SE_coords.tab \
         --ws $WS

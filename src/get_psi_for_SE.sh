@@ -32,13 +32,13 @@ WS="WS289"
 readLength=101
 
 
-SE_annot="data/suppa2_data/231109_events/${WS}_"
+SE_annot="data/suppa2_data/240906_events/${WS}_"
 
 
 bam_dir="/gpfs/gibbs/pi/hammarlund/CeNGEN/bulk/bulk_alignments/bsn12_bams"
-sj_dir="/vast/palmer/scratch/hammarlund/aw853/2023-11-08_bsn12/junctions"
-out_dir="data/2023-11-09_SE_PSI"
-tmp_dir="/vast/palmer/scratch/hammarlund/aw853/231109_SE_PSI_all_samples"
+sj_dir="/vast/palmer/scratch/hammarlund/aw853/2024-09-09_bsn12/junctions"
+out_dir="data/2024-09-06_SE_PSI"
+tmp_dir="/vast/palmer/scratch/hammarlund/aw853/240906_SE_PSI_all_samples"
 
 mkdir -p $out_dir
 
@@ -111,7 +111,7 @@ echo "Assembling the files and computing PSI."
 echo "#######################################"
 echo
 
-module swap BEDTools R
+module swap BEDTools R/4.2.0-foss-2020b
 
 Rscript src/assemble_psi.R \
         --se ${SE_annot}SE_coords.tab \

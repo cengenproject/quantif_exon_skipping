@@ -8,6 +8,7 @@
 
 In script `src/suppa2_generate_events.sh`, we run SUPPA2 to get SE (skipped exon) events annotation. It creates a tab file. In addition, it calls `generate_CI_events.R` and `generate_CE_events.R` to extract constitutively included (CI) and excluded (CE) exons from the same genes as the SE. Finally, it makes two bed files from the tab file, to be used for quantification.
 
+If needed, run `src/prep_alignments_bsn12.sh` (that in turns uses `src/combine_sj_files.R`) to assemble the technical replicates into a scratch directory. Only needed if it wasn't already done recently.
 
 Then `src/get_psi_for_SE.sh` counts inclusion and exclusion reads with `bedtools` and `grep`, starting with SE annotation bed, and calls `src/assemble_psi.R` to create the result `assembled_psi.tsv`. Note: takes about 2.5 minutes/sample (8h total), and requires up to 200 GB memory for some samples.
 
@@ -23,6 +24,7 @@ Finally (not on cluster), can use `R/format_SE_psi.R` to load `assembled_psi.tsv
 * 231109: WS289, bsn12 alignments
 * 231214: temporary export without filtering
 * 240308: quantifications (with proper filtering) of WS289, bsn12
+* 240906: correct bug in CI that created 38 incorrect events (e.g. `CI_610` had `exon_start` before `intron_start`)
 
 
 

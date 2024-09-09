@@ -11,6 +11,10 @@ suppressPackageStartupMessages({
 library(wbData)
 
 
+# functions ----
+# see ?sample: when `x` has length 1, it is (mistakenly) taken as 1:x
+safe_sample <- function(x, ...) x[sample.int(length(x), ...)]
+
 
 # read arguments
 library(optparse)
@@ -25,8 +29,8 @@ option_list <- list(
 
 # ~ validate inputs ----
 if(interactive()){
-  opt <- list(tab_file = "data/suppa2_data/221108_events/WS281_SE_coords.tab",
-              ws = "WS281")
+  opt <- list(tab_file = "data/suppa2_data/231109_events/WS289_SE_coords.tab",
+              ws = "WS289")
 } else{
   opt <- parse_args(OptionParser(option_list=option_list))
 }
@@ -34,6 +38,7 @@ if(interactive()){
 stopifnot(file.exists(opt$tab_file))
 
 options(wb_dir_cache = paste0("/gpfs/ycga/project/ysm/hammarlund/aw853/references/", opt$ws))
+
 
 
 
@@ -107,7 +112,7 @@ select_ci_exon <- function(my_gene, all_introns, all_exons){
   }
   
   # select one exon randomly
-  selected_exon <- sample(internal_constitutive_exons, 1)
+  selected_exon <- safe_sample(internal_constitutive_exons, 1)
   
   
   left_intron <- findOverlaps(exons[selected_exon,], shift(introns, 1L)) |>
