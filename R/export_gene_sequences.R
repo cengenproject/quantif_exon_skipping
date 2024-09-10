@@ -10,11 +10,11 @@ library(wbData)
 
 
 #~ Load reference data ----
-fasta <- Rsamtools::FaFile(str_remove(wb_get_genome_path(281), "\\.gz$"))
+fasta <- Rsamtools::FaFile(str_remove(wb_get_genome_path(289), "\\.gz$"))
 if(! file.exists(fasta$path)){
-  R.utils::gunzip(wb_get_genome_path(281))
+  R.utils::gunzip(wb_get_genome_path(289))
 }
-gene_coords <- wb_load_gene_coords(281)
+gene_coords <- wb_load_gene_coords(289)
 
 
 # which genes to keep
@@ -54,7 +54,7 @@ gr <- GRanges(seqnames = gene_coords$chr,
 gseq <- Biostrings::getSeq(fasta, gr)
 names(gseq) <- gene_coords$gene_id
 
-Biostrings::writeXStringSet(gseq, "data/intermediates_for_DL/230807_all_gene_sequences.fa")
+Biostrings::writeXStringSet(gseq, "data/intermediates_for_DL/240906_all_gene_sequences.fa")
 
-R.utils::gzip("data/intermediates_for_DL/230807_all_gene_sequences.fa")
+R.utils::gzip("data/intermediates_for_DL/240906_all_gene_sequences.fa")
 
