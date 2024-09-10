@@ -25,6 +25,7 @@ Finally (not on cluster), can use `R/format_SE_psi.R` to load `assembled_psi.tsv
 * 231214: temporary export without filtering
 * 240308: quantifications (with proper filtering) of WS289, bsn12
 * 240906: correct bug in CI that created 38 incorrect events (e.g. `CI_610` had `exon_start` before `intron_start`)
+* 240910: correct additional bug in CI_8 (incorrect intron)
 
 
 

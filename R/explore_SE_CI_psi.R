@@ -3,11 +3,11 @@
 # Inits ----
 library(tidyverse)
 
-psi <- read_tsv("data/export_for_arman/240308_PSI_quantifications.tsv") |>
+psi <- read_tsv("data/export_for_arman/240910_PSI_quantifications.tsv") |>
   mutate(type = str_match(event_id, "^(CI|SE|CE)_[0-9]+$")[,2],
          type = factor(type, levels = c("SE","CI","CE")))
 
-coords <- read_tsv("data/export_for_arman/240308_events_coordinates.tsv")
+coords <- read_tsv("data/export_for_arman/240910_events_coordinates.tsv")
 
 
 
@@ -45,6 +45,31 @@ psi |>
 
 # Compare with older versions ----
 
+#~ 240308
+
+
+
+psi_old <- read_tsv("data/export_for_arman/240308_PSI_quantifications.tsv") |>
+  mutate(type = str_match(event_id, "^(CI|SE|CE)_[0-9]+$")[,2],
+         type = factor(type, levels = c("SE","CI","CE")))
+psi_new <- psi
+
+old_ev_coords <- read_tsv("data/export_for_arman/240308_events_coordinates.tsv")
+
+new_old_correspondance <- right_join(coords, old_ev_coords |> rename(old_id = event_id),
+                                     by = c("intron_start", "intron_end", "exon_start", "exon_end",
+                                            "gene_length", "gene_id"),
+                                     relationship = "many-to-many") |>
+  filter(!is.na(event_id)) |>
+  select(new_id = event_id,
+         old_id)
+
+psi_old <- psi_old |>
+  left_join(new_old_correspondance,
+            by = c(event_id = "old_id"),
+            relationship = "many-to-many") |>
+  select(-event_id) |>
+  rename(event_id = new_id)
 
 
 

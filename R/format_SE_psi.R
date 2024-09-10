@@ -7,7 +7,7 @@ library(wbData)
 
 # Load and format data ----
 
-psi <- read_tsv("data/from_ruddle/2023-11-09_SE_PSI/assembled_psi.tsv",
+psi <- read_tsv("data/from_ruddle/2024-09-10_SE_PSI/assembled_psi.tsv",
                 col_types = cols(
                   name = col_character(),
                   gene = col_character(),
@@ -110,16 +110,126 @@ psi_export <- psi_export |>
 psi_export |>
   select(event_id, intron_start, intron_end, exon_start, exon_end, gene_length, gene_id) |>
   distinct() |>
-  write_tsv("data/export_for_arman/240308_events_coordinates.tsv")
+  write_tsv("data/export_for_arman/240910_events_coordinates.tsv")
 
 psi_export |>
   select(event_id, sample_id, nb_reads, PSI) |>
-  write_tsv("data/export_for_arman/240308_PSI_quantifications.tsv")
-
-  
+  write_tsv("data/export_for_arman/240910_PSI_quantifications.tsv")
 
 
+# check ----
+evc <- read_tsv("data/export_for_arman/240910_events_coordinates.tsv")
 
+
+
+stopifnot(all(evc$exon_end <= evc$gene_length))
+stopifnot(all(evc$intron_end <= evc$gene_length))
+stopifnot(all(evc$exon_start <= evc$gene_length))
+stopifnot(all(evc$intron_start <= evc$gene_length))
+stopifnot(all(evc$exon_end <= evc$intron_end))
+stopifnot(all(evc$exon_start >= evc$intron_start))
+
+evc |>
+  filter(exon_end > intron_end)
+psi_export |>
+  filter(exon_end > intron_end) |> slice_head(n = 1) |> as.data.frame()
+
+
+
+
+# Compare previous ----
+library(tidyverse)
+
+evc_old <- read_tsv("data/export_for_arman/240308_events_coordinates.tsv")
+evc_new <- read_tsv("data/export_for_arman/240910_events_coordinates.tsv")
+
+# non-CI identical
+waldo::compare(evc_old |> filter(!startsWith(event_id, "CI")),
+               evc_new |> filter(!startsWith(event_id, "CI")))
+
+evc_old |> filter(startsWith(event_id, "CI"))
+evc_new |> filter(startsWith(event_id, "CI"))
+
+# event names identical
+all.equal(evc_old$event_id |> sort(), evc_new$event_id |> sort())
+
+# gene IDs identical (i.e. CI_n corresponds to the same gene)
+full_join(
+  evc_old |> filter(startsWith(event_id, "CI")) |> select(event_id, gene_id),
+  evc_new |> filter(startsWith(event_id, "CI")) |> select(event_id, gene_id),
+  by = "event_id"
+  ) |>
+  filter(gene_id.x != gene_id.y)
+
+
+xx <- full_join(
+  evc_old |> filter(startsWith(event_id, "CI")),
+  evc_new |> filter(startsWith(event_id, "CI")),
+  by = "event_id"
+)
+
+
+stable_CIs <- xx$event_id[xx$intron_start.x == xx$intron_start.y &
+                            xx$intron_end.x == xx$intron_end.y &
+                            xx$exon_start.x == xx$exon_start.y &
+                            xx$exon_end.x == xx$exon_end.y &
+                            xx$gene_length.x == xx$gene_length.y]
+length(stable_CIs)
+
+unstable_CIs <- setdiff(xx$event_id, stable_CIs)
+length(unstable_CIs)
+
+xx |>
+  filter(event_id %in% unstable_CIs) |>
+  mutate(stab_gene = gene_id.x == gene_id.y) |>
+  pull(stab_gene) |>
+  table()
+
+
+psi_old <- read_tsv("data/export_for_arman/240308_PSI_quantifications.tsv")
+psi_new <- read_tsv("data/export_for_arman/240910_PSI_quantifications.tsv")
+
+waldo::compare(psi_old |> filter(!startsWith(event_id, "CI")),
+               psi_new |> filter(!startsWith(event_id, "CI")))
+
+psi_old |> filter(startsWith(event_id, "CI"))
+psi_new |> filter(startsWith(event_id, "CI"))
+
+all.equal(psi_old$event_id |> sort(), psi_new$event_id |> sort())
+
+
+waldo::compare(
+  psi_old |> filter(startsWith(event_id, "CI"), event_id %in% stable_CIs),
+  psi_new |> filter(startsWith(event_id, "CI"), event_id %in% stable_CIs)
+)
+
+
+yy <- full_join(
+  psi_old |> filter(startsWith(event_id, "CI"), event_id %in% unstable_CIs),
+  psi_new |> filter(startsWith(event_id, "CI"), event_id %in% unstable_CIs),
+  by = c("event_id", "sample_id")
+)
+
+ggplot(yy) +
+  theme_classic() +
+  scale_x_log10() + scale_y_log10() +
+  coord_equal() +
+  geom_point(aes(x = nb_reads.x, y = nb_reads.y),
+             alpha = .02)
+
+
+ggplot(yy) +
+  theme_classic() +
+  coord_equal() +
+  geom_point(aes(x = PSI.x, y = PSI.y),
+             alpha = .02)
+ggplot(yy) +
+  theme_classic() +
+  coord_equal() +
+  geom_hex(aes(x = PSI.x, y = PSI.y))
+
+
+table(yy$PSI.x < .9, yy$PSI.y < .9)
 
 
 
