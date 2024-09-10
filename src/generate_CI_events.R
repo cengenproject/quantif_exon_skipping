@@ -116,11 +116,9 @@ select_ci_exon <- function(my_gene, all_introns, all_exons){
   
   
   left_intron <- findOverlaps(exons[selected_exon,], shift(introns, 1L)) |>
-    as.data.frame() |>
-    anti_join(ex_intr_overlap, by = c("queryHits", "subjectHits"))
+    as.data.frame()
   right_intron <- findOverlaps(exons[selected_exon,], shift(introns, -1L)) |>
-    as.data.frame() |>
-    anti_join(ex_intr_overlap, by = c("queryHits", "subjectHits"))
+    as.data.frame()
   
   flanking_introns <- introns[c(left_intron$subjectHits, right_intron$subjectHits),]
   

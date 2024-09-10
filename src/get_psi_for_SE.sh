@@ -32,13 +32,13 @@ WS="WS289"
 readLength=101
 
 
-SE_annot="data/suppa2_data/240906_events/${WS}_"
+SE_annot="data/suppa2_data/240910_events/${WS}_"
 
 
 bam_dir="/gpfs/gibbs/pi/hammarlund/CeNGEN/bulk/bulk_alignments/bsn12_bams"
 sj_dir="/vast/palmer/scratch/hammarlund/aw853/2024-09-09_bsn12/junctions"
-out_dir="data/2024-09-06_SE_PSI"
-tmp_dir="/vast/palmer/scratch/hammarlund/aw853/240906_SE_PSI_all_samples"
+out_dir="data/2024-09-10_SE_PSI"
+tmp_dir="/vast/palmer/scratch/hammarlund/aw853/240910_SE_PSI_all_samples"
 
 mkdir -p $out_dir
 
