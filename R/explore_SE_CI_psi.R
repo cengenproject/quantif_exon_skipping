@@ -43,6 +43,53 @@ psi |>
   facet_wrap(~type)
 
 
+
+
+#~ Check sequence at boundaries ----
+
+gseq <- Biostrings::readDNAStringSet("data/intermediates_for_DL/240906_all_gene_sequences.fa.gz")
+
+# 0         intron_start       exon_start     exon_end         intron_end   gene_length
+# |              |                    |         |               |            |
+# ---------------GT-----------------AG-----------GT------------AG-------------
+
+correct_boundary_seq <- logical(length = nrow(coords))
+for(i in 1:nrow(coords)){
+  seq <- gseq[[ coords$gene_id[[i]] ]]
+  
+  irg <- IRanges::IRanges(
+    start = c(
+      coords$intron_start[[i]],
+      coords$intron_end[[i]] - 1L,
+      coords$exon_start[[i]] - 2L,
+      coords$exon_end[[i]] + 1L
+    ),
+    end = c(
+      coords$intron_start[[i]] + 1L,
+      coords$intron_end[[i]],
+      coords$exon_start[[i]] - 1L,
+      coords$exon_end[[i]] + 2L
+    )
+  )
+  
+  correct_boundary_seq[[i]] <- identical(
+    Biostrings::extractAt(seq, irg) |> as.character(),
+    c("GT","AG","AG","GT")
+  )
+}
+
+table(correct_boundary_seq)
+# correct_boundary_seq
+# FALSE  TRUE 
+#    21  2279 
+
+#> manual checking SE_640, CE_692 (and CI_664 same place), SE_975: non-canonical sites in the annotation.
+
+
+
+
+
+
 # Compare with older versions ----
 
 #~ 240308
